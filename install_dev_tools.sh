@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Docker
-if !command -v docker &> /dev/null; then
+if ! command -v docker &> /dev/null; then
 	echo "Встановлення докер.."
 	sudo apt update
 	sudo apt install -y docker.io
