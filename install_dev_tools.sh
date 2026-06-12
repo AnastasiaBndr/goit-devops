@@ -17,9 +17,9 @@ else
 fi
 
 # Python 3.9+
-if ! command -v python3 &> /dev/null; then
-    echo "Встановлення Python..."
-    sudo apt install -y python3
+if ! python3 -c "import sys; assert sys.version_info >= (3,9)" &> /dev/null; then
+    echo "Встановлення Python 3.9+..."
+    sudo apt install -y python3.9
 else
     echo "Python вже встановлений"
 fi
@@ -27,7 +27,7 @@ fi
 # Django
 if ! python3 -c "import django" &> /dev/null; then
     echo "Встановлення Django..."
-    sudo apt install -y python3-django
+    pip3 install django --break-system-packages
 else
     echo "Django вже встановлений"
 fi
