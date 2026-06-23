@@ -1,5 +1,7 @@
 resource "aws_vpc" "main" {
-  cidr_block = var.vpc_cidr_block
+  cidr_block           = var.vpc_cidr_block
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
   tags = {
     Name = var.vpc_name
@@ -35,26 +37,24 @@ resource "aws_internet_gateway" "main" {
   tags = {
     Name = "${var.vpc_name}-igw"
   }
-
 }
 
 resource "aws_eip" "nat" {
-   count  = length(var.public_subnets)
-   domain = "vpc"
+  count  = length(var.public_subnets)
+  domain = "vpc"
 
-    tags = {
+  tags = {
     Name = "${var.vpc_name}-eip-${count.index + 1}"
-                }
-              }
+  }
+}
 
 resource "aws_nat_gateway" "main" {
   count         = length(var.public_subnets)
-
   allocation_id = aws_eip.nat[count.index].id
-
   subnet_id     = aws_subnet.public[count.index].id
 
- tags = {
- Name = "${var.vpc_name}-nat-${count.index + 1}"
-   }
+  tags = {
+    Name = "${var.vpc_name}-nat-${count.index + 1}"
+  }
 }
+
