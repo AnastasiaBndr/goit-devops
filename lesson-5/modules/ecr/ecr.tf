@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_ecr_repository" "main" {
   name = var.ecr_name
 
@@ -6,6 +8,10 @@ resource "aws_ecr_repository" "main" {
   }
 
   image_tag_mutability = "MUTABLE"
+
+  encryption_configuration {
+    encryption_type = "AES256"
+  }
 
   tags = {
     Name = var.ecr_name
@@ -22,7 +28,7 @@ resource "aws_ecr_repository_policy" "main" {
         Sid    = "AllowPushPull"
         Effect = "Allow"
         Principal = {
-          AWS = "*"
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         }
         Action = [
           "ecr:GetDownloadUrlForLayer",

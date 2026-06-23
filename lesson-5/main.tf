@@ -15,8 +15,21 @@ module "vpc" {
 module "ecr" {
   source      = "./modules/ecr"
   ecr_name    = "lesson-5-ecr"
-  scan_on_push = true
+  scan_on_push= true
 }
 
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
+    }
+  }
+
+
+}
+provider "aws" {
+  region = "us-west-2"
+}
 
 
