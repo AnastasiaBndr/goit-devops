@@ -30,7 +30,7 @@ module "ecr" {
 module "eks" {
   source = "./modules/eks"
   cluster_name = "lesson-7-eks"
-  subnet_ids = module.vpc.public_subnet_ids
+  subnet_ids = module.vpc.private_subnet_ids
   instance_type = "t3.micro"
   desired_size = 1
   max_size = 2
@@ -38,9 +38,17 @@ module "eks" {
 }
 
 
-
 provider "aws" {
   region = "us-west-2"
+}
+
+module "jenkins" {
+  source       = "./modules/jenkins"
+  cluster_name = module.eks.eks_cluster_name
+
+  providers = {
+    helm = helm
+  }
 }
 
 
