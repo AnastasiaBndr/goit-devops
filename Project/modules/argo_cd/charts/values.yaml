@@ -1,0 +1,18 @@
+applications:
+  - name: django-app
+    namespace: argocd
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: default
+    source:
+      repoURL: https://github.com/AnastasiaBndr/goit-devops.git
+      targetRevision: lesson-8-9
+      path: charts/django-app
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+
+repositories:
+  - url: https://github.com/AnastasiaBndr/goit-devops.git
+    name: goit-devops

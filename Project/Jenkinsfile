@@ -1,0 +1,87 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    command:
+    - sleep
+    args:
+    - 9999999
+    volumeMounts:
+    - name: workspace
+      mountPath: /workspace
+  - name: git
+    image: alpine/git:latest
+    command:
+    - sleep
+    args:
+    - 9999999
+  volumes:
+  - name: workspace
+    emptyDir: {}
+"""
+        }
+    }
+
+    environment {
+        ECR_URL = "${module.ecr.ecr_repository_url}"
+        AWS_REGION = "us-west-2"
+        IMAGE_TAG = "${BUILD_NUMBER}"
+        GIT_REPO = "https://github.com/AnastasiaBndr/goit-devops.git"
+        GIT_BRANCH = "lesson-8-9"
+    }
+
+    stages {
+        stage('Build & Push to ECR') {
+            steps {
+                container('kaniko') {
+                    sh """
+                        /kaniko/executor \
+                            --context=dir:///workspace \
+                            --dockerfile=/workspace/Dockerfile \
+                            --destination=${ECR_URL}:${IMAGE_TAG} \
+                            --destination=${ECR_URL}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Update values.yaml') {
+            steps {
+                container('git') {
+                    withCredentials([usernamePassword(
+                        credentialsId: 'github-token',
+                        usernameVariable: 'GIT_USER',
+                        passwordVariable: 'GIT_TOKEN'
+                    )]) {
+                        sh """
+                            git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/AnastasiaBndr/goit-devops.git /tmp/repo
+                            cd /tmp/repo
+                            git checkout ${GIT_BRANCH}
+                            sed -i 's|tag:.*|tag: ${IMAGE_TAG}|' charts/django-app/values.yaml
+                            git config user.email "ci@jenkins.com"
+                            git config user.name "Jenkins CI"
+                            git add charts/django-app/values.yaml
+                            git commit -m "Update image tag to ${IMAGE_TAG}"
+                            git push origin ${GIT_BRANCH}
+                        """
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline успішно завершено! Образ: ${ECR_URL}:${IMAGE_TAG}"
+        }
+        failure {
+            echo "Pipeline завершився з помилкою!"
+        }
+    }
+}

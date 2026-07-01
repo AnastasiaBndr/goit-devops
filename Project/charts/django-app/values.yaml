@@ -1,7 +1,7 @@
 replicaCount:2
 
 image:
-  repository: "<account_id>.dkr.ecr.us-west-2.amazonaws.com/lesson-7-ecr"
+  repository: "<account_id>.dkr.ecr.us-west-2.amazonaws.com/lesson-8-9-ecr"
   tag: latest
   pullPolicy: IfNotPresent
 
