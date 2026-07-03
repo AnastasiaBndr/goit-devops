@@ -13,10 +13,10 @@
 
 ## Terraform команди
 
-terraform init
-terraform plan
-terraform apply
-terraform destroy
+```terraform init```
+```terraform plan```
+```terraform apply```
+```terraform destroy```
 
 ## CI/CD схема
 
@@ -32,21 +32,21 @@ Argo CD деплоїть новий образ в Kubernetes
 
 Після terraform apply:
 
-kubectl get svc -n jenkins
+```kubectl get svc -n jenkins```
 
-kubectl exec -n jenkins -it <pod-name> -- cat /var/jenkins_home/secrets/initialAdminPassword
+```kubectl exec -n jenkins -it <pod-name> -- cat /var/jenkins_home/secrets/initialAdminPassword```
 
 ## Перевірка Argo CD
 
-kubectl get svc -n argocd
+```kubectl get svc -n argocd```
 
-kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d
+```kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d```
 
 ## Підключення до кластера
 
-aws eks update-kubeconfig --region us-west-2 --name lesson-8-9-eks
+```aws eks update-kubeconfig --region us-west-2 --name lesson-8-9-eks```
 
 ## Перевірка деплою
 
-kubectl get pods
-kubectl get svc
+```kubectl get pods```
+```kubectl get svc```
