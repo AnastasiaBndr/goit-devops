@@ -1,0 +1,23 @@
+controller:
+  installPlugins:
+    - kubernetes:latest
+    - workflow-aggregator:latest
+    - git:latest
+    - credentials-binding:latest
+    - amazon-ecr:latest
+    - pipeline-aws:latest
+  serviceType: LoadBalancer
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+    limits:
+      cpu: "2000m"
+      memory: "2048Mi"
+
+agent:
+  enabled: true
+
+persistence:
+  enabled: true
+  size: "8Gi"
