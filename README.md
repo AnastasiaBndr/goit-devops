@@ -30,7 +30,7 @@ Argo CD автоматично деплоїть новий образ в Kuberne
 ```terraform plan```
 
 3. Застосування:
-```terraform apply```
+```terraform apply -var="db_password=<your password>"```
 
 4. Підключення до кластера:
 ```aws eks update-kubeconfig --region us-west-2 --name lesson-8-9-eks```
