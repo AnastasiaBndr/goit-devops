@@ -67,3 +67,55 @@ kubectl get svc -n argocd
 5. Перевірити поди в кластері:
 ```kubectl get pods```
 ```kubectl get svc```
+
+## RDS модуль
+
+Універсальний модуль для створення RDS або Aurora кластера.
+
+use_aurora = true  → Aurora Cluster + writer + reader replicas
+use_aurora = false → звичайна RDS instance
+
+В обох випадках створюється:
+- DB Subnet Group
+- Security Group  
+- Parameter Group
+
+### Приклад використання
+
+module "rds" {
+  source     = "./modules/rds"
+  name       = "myapp-db"
+  use_aurora = true
+
+  engine_cluster                = "aurora-postgresql"
+  engine_version_cluster        = "15.3"
+  parameter_group_family_aurora = "aurora-postgresql15"
+
+  instance_class          = "db.t3.medium"
+  db_name                 = "myapp"
+  username                = "postgres"
+  password                = "your-password"
+  vpc_id                  = module.vpc.vpc_id
+  subnet_private_ids      = module.vpc.private_subnet_ids
+  subnet_public_ids       = module.vpc.public_subnet_ids
+  backup_retention_period = 7
+
+  parameters = {
+    max_connections            = "200"
+    log_min_duration_statement = "500"
+  }
+}
+
+### Як змінити тип БД
+
+Звичайна RDS PostgreSQL:
+  use_aurora             = false
+  engine                 = "postgres"
+  engine_version         = "15.3"
+  parameter_group_family_rds = "postgres15"
+
+Aurora MySQL:
+  use_aurora                    = true
+  engine_cluster                = "aurora-mysql"
+  engine_version_cluster        = "8.0"
+  parameter_group_family_aurora = "aurora-mysql8.0"
