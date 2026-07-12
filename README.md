@@ -82,6 +82,7 @@ use_aurora = false → звичайна RDS instance
 
 ### Приклад використання
 
+```terraform
 module "rds" {
   source     = "./modules/rds"
   name       = "myapp-db"
@@ -105,6 +106,7 @@ module "rds" {
     log_min_duration_statement = "500"
   }
 }
+```
 
 ### Як змінити тип БД
 
