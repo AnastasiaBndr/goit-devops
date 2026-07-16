@@ -138,4 +138,12 @@ module "rds" {
   
 }
 
+module "monitoring" {
+  source                 = "./modules/monitoring"
+  cluster_name           = module.eks.eks_cluster_name
+  grafana_admin_password = var.grafana_admin_password
+
+  depends_on = [module.eks]
+}
+
 

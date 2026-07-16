@@ -1,15 +1,15 @@
-# CI/CD Infrastructure: Jenkins + Argo CD + Terraform
+## Final Project: AWS Infrastructure with CI/CD and Monitoring
 
-Повний CI/CD процес з Jenkins, Argo CD, EKS та ECR на AWS.
+Повна інфраструктура на AWS з використанням Terraform, Jenkins, Argo CD, Prometheus та Grafana.
 
 ## Архітектура
 
 Пуш коду
-        ↓
+↓
 Jenkins білдить Docker образ → пушить в ECR → оновлює тег в values.yaml
-        ↓
+↓
 Argo CD бачить зміни в Git
-        ↓
+↓
 Argo CD автоматично деплоїть новий образ в Kubernetes
 
 ## Модулі
@@ -20,64 +20,73 @@ Argo CD автоматично деплоїть новий образ в Kuberne
 - eks — Kubernetes кластер
 - jenkins — CI сервер для білду та пушу образів
 - argo_cd — CD інструмент для синхронізації змін з Git
+- monitoring — Prometheus + Grafana для моніторингу
+
+## Безпека
+
+- VPC з приватними підмережами для EKS та RDS
+- IAM ролі з мінімальними правами для кожного сервісу
+- Security Groups обмежують доступ до RDS
+- Секрети передаються через змінні середовища, не хардкодяться
 
 ## Застосування Terraform
 
 1. Ініціалізація:
-```terraform init```
+   `terraform init`
 
 2. Перегляд змін:
-```terraform plan```
+   `terraform plan`
 
 3. Застосування:
-```terraform apply -var="db_password=<your password>"```
+   `terraform apply -var="db_password=<your password>"`
 
 4. Підключення до кластера:
-```aws eks update-kubeconfig --region us-west-2 --name lesson-8-9-eks```
+   `aws eks update-kubeconfig --region us-west-2 --name lesson-8-9-eks`
 5. Видалення інфраструктури:
-```terraform destroy```
+   `terraform destroy`
 
 ## Перевірка Jenkins job
 
 1. Отримання URL Jenkins:
-```kubectl get svc -n jenkins```
+   `kubectl get svc -n jenkins`
 
 2. Відкриття Jenkins у браузері за отриманим URL
 
 3. Отримання пароля адміністратора:
-```kubectl exec -n jenkins -it <pod-name> -- cat /var/jenkins_home/secrets/initialAdminPassword```
+   `kubectl exec -n jenkins -it <pod-name> -- cat /var/jenkins_home/secrets/initialAdminPassword`
 
 4. Запуск pipeline job вручну або очікування тригеру від git push
 
 5. Перевіка логів pipeline:
-```kubectl logs -n jenkins <pod-name>```
+   `kubectl logs -n jenkins <pod-name>`
 
 ## Як побачити результат в Argo CD
 
 1. Отримати URL Argo CD:
-kubectl get svc -n argocd
+   kubectl get svc -n argocd
 
 2. Отримати пароль адміністратора:
-```kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d```
+   `kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d`
 
 3. Відкрити Argo CD у браузері та залогінитись (admin / пароль з попереднього кроку)
 
 4. Перевірити статус застосунку django-app — має бути Synced і Healthy
 
 5. Перевірити поди в кластері:
-```kubectl get pods```
-```kubectl get svc```
+   `kubectl get pods`
+   `kubectl get svc`
 
 ## RDS модуль
 
 Універсальний модуль для створення RDS або Aurora кластера.
 
-use_aurora = true  → Aurora Cluster + writer + reader replicas
+use_aurora = true → Aurora Cluster + writer + reader replicas
 use_aurora = false → звичайна RDS instance
 
 В обох випадках створюється:
+
 - DB Subnet Group
-- Security Group  
+- Security Group
 - Parameter Group
 
 ### Приклад використання
@@ -111,13 +120,46 @@ module "rds" {
 ### Як змінити тип БД
 
 Звичайна RDS PostgreSQL:
-  use_aurora             = false
-  engine                 = "postgres"
-  engine_version         = "15.3"
-  parameter_group_family_rds = "postgres15"
+use_aurora = false
+engine = "postgres"
+engine_version = "15.3"
+parameter_group_family_rds = "postgres15"
 
 Aurora MySQL:
-  use_aurora                    = true
-  engine_cluster                = "aurora-mysql"
-  engine_version_cluster        = "8.0"
-  parameter_group_family_aurora = "aurora-mysql8.0"
+use_aurora = true
+engine_cluster = "aurora-mysql"
+engine_version_cluster = "8.0"
+parameter_group_family_aurora = "aurora-mysql8.0"
+
+## Моніторинг
+
+1. Отримати URL Grafana:
+   kubectl get svc -n monitoring
+
+2. Або через port-forward:
+   kubectl port-forward svc/grafana 3000:80 -n monitoring
+
+3. Залогінитись (admin / пароль з змінної grafana_admin_password)
+
+4. Перевірити дашборди:
+
+- Kubernetes Cluster Overview
+- Node metrics
+- Pod metrics
+
+## Автомасштабування
+
+HPA для Django застосунку:
+
+- Мінімум 2 поди
+- Максимум 6 подів
+- Масштабування при CPU > 70%
+
+Cluster Autoscaler для EKS нод:
+
+- Автоматично додає ноди при нестачі ресурсів
+- Автоматично видаляє незайняті ноди
+
+## Видалення інфраструктури
+
+terraform destroy
