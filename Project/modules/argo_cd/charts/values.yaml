@@ -6,13 +6,15 @@ applications:
       namespace: default
     source:
       repoURL: https://github.com/AnastasiaBndr/goit-devops.git
-      targetRevision: lesson-8-9
-      path: charts/django-app
+      targetRevision: main
+      path: Project/charts/django-app
+      helm:
+        parameters:
+          - name: image.repository
+            value: "{{ .Values.ecrRepoUrl }}"
     syncPolicy:
       automated:
         prune: true
         selfHeal: true
 
-repositories:
-  - url: https://github.com/AnastasiaBndr/goit-devops.git
-    name: goit-devops
+ecrRepoUrl: ""

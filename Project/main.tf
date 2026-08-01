@@ -86,6 +86,7 @@ module "argo_cd" {
   source       = "./modules/argo_cd"
   cluster_name = module.eks.eks_cluster_name
   repo_url     = "https://github.com/AnastasiaBndr/goit-devops.git"
+  ecr_repo_url = module.ecr.repository_url
 
   depends_on = [module.eks, module.jenkins]
 }

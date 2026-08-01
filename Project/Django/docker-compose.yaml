@@ -17,8 +17,10 @@ services:
   db:
     image: postgres:15
     container_name: postgres_db
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_DB=${DB_NAME:-djangodb}
+      - POSTGRES_USER=${DB_USER:-djangouser}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:

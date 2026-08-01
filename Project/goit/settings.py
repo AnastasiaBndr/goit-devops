@@ -20,11 +20,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-tr_(el4-=x=#1b$&&x2tyt!cl5k6et5izem@wms@!97tayvcz#'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ["SECRET_KEY"]
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'django', 'django_app']
 
@@ -115,13 +112,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DATABASES = {
-
-	'default': {
-		'ENGINE': 'django.db.backends.postgresql',
-		'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
-		'PORT': os.environ.get('POSTGRES_PORT', '5432'),
-		'NAME': os.environ.get('POSTGRES_DB', 'postgres'),
-		'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-		'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''),
-	}
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ["DB_NAME"],
+        "USER": os.environ["DB_USER"],
+        "PASSWORD": os.environ["DB_PASSWORD"],
+        "HOST": os.environ["DB_HOST"],
+        "PORT": os.environ["DB_PORT"],
+    }
 }

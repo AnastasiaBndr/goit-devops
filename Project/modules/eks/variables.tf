@@ -38,3 +38,8 @@ variable "min_size" {
   default     = 1
 }
 
+variable "tags" {
+  description = "Теги для ресурсів EKS"
+  type        = map(string)
+  default     = {}
+}

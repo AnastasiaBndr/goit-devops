@@ -25,4 +25,9 @@ resource "helm_release" "argocd_apps" {
   values = [file("${path.module}/charts/values.yaml")]
 
   depends_on = [helm_release.argocd]
+
+  set {
+    name  = "ecrRepoUrl"
+    value = var.ecr_repo_url
+  }
 }

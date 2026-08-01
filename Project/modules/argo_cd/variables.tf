@@ -25,3 +25,8 @@ variable "aws_region" {
   type        = string
   default     = "us-west-2"
 }
+
+variable "ecr_repo_url" {
+  description = "URL ECR репозиторію для Django образу"
+  type        = string
+}
