@@ -6,8 +6,8 @@ resource "aws_s3_bucket" "terraform_state" {
   }
 
   tags = {
-    Name = var.bucket_name
-    Environments="lesson-8-9"
+    Name         = var.bucket_name
+    Environments = "lesson-8-9"
   }
 }
 

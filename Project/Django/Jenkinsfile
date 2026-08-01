@@ -5,6 +5,7 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
+  serviceAccountName: jenkins-sa
   containers:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
@@ -21,6 +22,9 @@ spec:
     - sleep
     args:
     - 9999999
+    volumeMounts:
+    - name: workspace
+      mountPath: /workspace
   volumes:
   - name: workspace
     emptyDir: {}
@@ -29,21 +33,27 @@ spec:
     }
 
     environment {
-        ECR_URL = "${module.ecr.ecr_repository_url}"
+        ECR_URL = credentials('ecr-repo-url')
         AWS_REGION = "us-west-2"
         IMAGE_TAG = "${BUILD_NUMBER}"
         GIT_REPO = "https://github.com/AnastasiaBndr/goit-devops.git"
-        GIT_BRANCH = "lesson-8-9"
+        GIT_BRANCH = "main"
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Build & Push to ECR') {
             steps {
                 container('kaniko') {
                     sh """
                         /kaniko/executor \
                             --context=dir:///workspace \
-                            --dockerfile=/workspace/Dockerfile \
+                            --dockerfile=/workspace/Django/Dockerfile \
                             --destination=${ECR_URL}:${IMAGE_TAG} \
                             --destination=${ECR_URL}:latest
                     """
@@ -63,10 +73,10 @@ spec:
                             git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/AnastasiaBndr/goit-devops.git /tmp/repo
                             cd /tmp/repo
                             git checkout ${GIT_BRANCH}
-                            sed -i 's|tag:.*|tag: ${IMAGE_TAG}|' charts/django-app/values.yaml
+                            sed -i 's|tag:.*|tag: ${IMAGE_TAG}|' Project/charts/django-app/values.yaml
                             git config user.email "ci@jenkins.com"
                             git config user.name "Jenkins CI"
-                            git add charts/django-app/values.yaml
+                            git add Project/charts/django-app/values.yaml
                             git commit -m "Update image tag to ${IMAGE_TAG}"
                             git push origin ${GIT_BRANCH}
                         """

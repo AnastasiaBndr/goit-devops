@@ -147,6 +147,10 @@ parameter_group_family_aurora = "aurora-mysql8.0"
 - Node metrics
 - Pod metrics
 
+## Перевірка Helm чарту
+
+helm lint Project/charts/django-app/
+
 ## Автомасштабування
 
 HPA для Django застосунку:

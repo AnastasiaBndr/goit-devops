@@ -74,6 +74,7 @@ variable "subnet_private_ids" {
 variable "subnet_public_ids" {
   description = "Список ID публічних підмереж для DB Subnet Group"
   type        = list(string)
+  default = []
 }
 
 variable "publicly_accessible" {

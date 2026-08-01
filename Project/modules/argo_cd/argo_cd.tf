@@ -18,9 +18,9 @@ resource "helm_release" "argocd" {
 }
 
 resource "helm_release" "argocd_apps" {
-  name       = "argocd-apps"
-  chart      = "${path.module}/charts"
-  namespace  = kubernetes_namespace.argocd.metadata[0].name
+  name      = "argocd-apps"
+  chart     = "${path.module}/charts"
+  namespace = kubernetes_namespace.argocd.metadata[0].name
 
   values = [file("${path.module}/charts/values.yaml")]
 
